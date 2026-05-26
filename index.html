@@ -22,28 +22,27 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* Hero 이미지 바로 아래에 노출되는 고정 이미지 */
-    .hero-fixed-image {
-      padding: 0;
-      margin: 0;
+    /* Love Story에 출력되는 이미지들 바로 밑, Gallery 섹션 바로 위에 들어가는 고정 이미지 */
+    .story-bottom-fixed-image {
+      width: var(--story-bottom-fixed-width, 100%);
+      max-width: var(--story-bottom-fixed-max-width, 100%);
+      margin: var(--story-bottom-fixed-margin, 28px auto 0);
+      transform: translate(var(--story-bottom-fixed-x, 0px), var(--story-bottom-fixed-y, 0px));
+      overflow: hidden;
+      border-radius: var(--story-bottom-fixed-radius, 0px);
       background: transparent;
     }
 
-    .hero-fixed-image[hidden] {
+    .story-bottom-fixed-image[hidden] {
       display: none !important;
     }
 
-    .hero-fixed-image__inner {
-      width: 100%;
-      margin: 0 auto;
-      overflow: hidden;
-    }
-
-    .hero-fixed-image__photo {
+    .story-bottom-fixed-image__photo {
       display: block;
       width: 100%;
-      height: auto;
-      object-fit: cover;
+      height: var(--story-bottom-fixed-height, auto);
+      object-fit: var(--story-bottom-fixed-fit, cover);
+      object-position: var(--story-bottom-fixed-position, center center);
     }
   </style>
   <script src="config.js"></script>
@@ -113,13 +112,6 @@
       </div>
     </section>
 
-    <!-- Hero Fixed Image Section : 메인 hero 이미지 바로 아래 고정 이미지 -->
-    <section class="section hero-fixed-image" id="heroFixedImageSection" hidden>
-      <div class="hero-fixed-image__inner">
-        <img class="hero-fixed-image__photo" id="heroFixedImage" src="" alt="웨딩 사진" loading="eager">
-      </div>
-    </section>
-
     <!-- Greeting Section -->
     <section class="section greeting" id="greeting">
       <div class="section__inner">
@@ -137,6 +129,11 @@
         <div class="section__divider animate-item" data-animate="fade-in"></div>
         <p class="story__text animate-item" data-animate="fade-up" id="storyContent"></p>
         <div class="story__photos" id="storyPhotos"></div>
+
+        <!-- Love Story 하단 고정 이미지 : Story 이미지들 바로 밑 / Gallery 바로 위 -->
+        <div class="story-bottom-fixed-image animate-item" data-animate="fade-up" id="storyBottomFixedImageBlock" hidden>
+          <img class="story-bottom-fixed-image__photo" id="storyBottomFixedImage" src="" alt="웨딩 사진" loading="lazy">
+        </div>
       </div>
     </section>
 
@@ -226,34 +223,60 @@
   </main>
 
   <script src="script.js"></script>
+
   <script>
-    // config.js의 CONFIG.heroFixedImage 설정값으로 hero 아래 고정 이미지를 표시합니다.
+    // CONFIG.storyFixedImage 설정값으로 Love Story 이미지들 바로 밑, Gallery 섹션 바로 위에 추가 이미지를 표시합니다.
     (function () {
-      function initHeroFixedImage() {
-        var section = document.getElementById('heroFixedImageSection');
-        var img = document.getElementById('heroFixedImage');
+      function setCssVar(element, name, value) {
+        if (value !== undefined && value !== null && value !== '') {
+          element.style.setProperty(name, value);
+        }
+      }
 
-        if (!section || !img || typeof CONFIG === 'undefined') return;
+      function initStoryBottomFixedImage() {
+        if (typeof CONFIG === 'undefined') return;
 
-        var fixedImage = CONFIG.heroFixedImage || {};
-        var isEnabled = fixedImage.enabled === true;
+        var block = document.getElementById('storyBottomFixedImageBlock');
+        var img = document.getElementById('storyBottomFixedImage');
+        var storyPhotos = document.getElementById('storyPhotos');
+
+        // 이전 수정본의 CONFIG.heroFixedImage를 사용 중이어도 그대로 읽히도록 호환 처리
+        var fixedImage = CONFIG.storyFixedImage || CONFIG.heroFixedImage || {};
         var imageSrc = fixedImage.src || fixedImage.image || fixedImage.path || '';
 
-        if (!isEnabled || !imageSrc) {
-          section.hidden = true;
+        if (!block || !img || fixedImage.enabled !== true || !imageSrc) {
+          if (block) block.hidden = true;
           return;
+        }
+
+        // 정확한 위치: Love Story에 출력되는 이미지들(storyPhotos) 바로 밑
+        if (storyPhotos && storyPhotos.parentNode && block.previousElementSibling !== storyPhotos) {
+          storyPhotos.insertAdjacentElement('afterend', block);
         }
 
         img.src = imageSrc;
         img.alt = fixedImage.alt || '웨딩 사진';
-        section.hidden = false;
+
+        setCssVar(block, '--story-bottom-fixed-width', fixedImage.width || '100%');
+        setCssVar(block, '--story-bottom-fixed-max-width', fixedImage.maxWidth || '100%');
+        setCssVar(block, '--story-bottom-fixed-margin', fixedImage.margin || '28px auto 0');
+        setCssVar(block, '--story-bottom-fixed-x', fixedImage.x || '0px');
+        setCssVar(block, '--story-bottom-fixed-y', fixedImage.y || '0px');
+        setCssVar(block, '--story-bottom-fixed-radius', fixedImage.radius || '0px');
+        setCssVar(img, '--story-bottom-fixed-height', fixedImage.height || 'auto');
+        setCssVar(img, '--story-bottom-fixed-fit', fixedImage.objectFit || 'cover');
+        setCssVar(img, '--story-bottom-fixed-position', fixedImage.objectPosition || 'center center');
+
+        block.hidden = false;
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initHeroFixedImage);
+        document.addEventListener('DOMContentLoaded', initStoryBottomFixedImage);
       } else {
-        initHeroFixedImage();
+        initStoryBottomFixedImage();
       }
+      window.addEventListener('load', initStoryBottomFixedImage);
+      window.setTimeout(initStoryBottomFixedImage, 300);
     })();
   </script>
 </body>
