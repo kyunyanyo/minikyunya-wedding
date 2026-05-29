@@ -49,7 +49,7 @@ const CONFIG = {
   // ── 우리의 이야기 ──
   story: {
     title: "Love Story",
-    content: "함께 웃고, 함께 걸어온 시간들이 모여\n이제 하나의 약속이 되었습니다.\n\n소중한 분들을 모시고\n저희의 새로운 시작을 함께 나누고자 합니다."
+    content: "The days we shared together slowly became a lifetime."
   },
 
   // ── 마음 전하실 곳 ──
