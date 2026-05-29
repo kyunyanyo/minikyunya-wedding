@@ -50,7 +50,7 @@ const CONFIG = {
   wedding: {
     date: "2026-08-02",
     time: "11:00",
-    venue: "아펠가모 공덕",
+    venue: "♥ 아펠가모 공덕 ♥",
     hall: "라로브홀 7층",
     address: "서울특별시 마포대로92, 효성헤링턴스퀘어 B동",
     tel: "02-2197-0230",
