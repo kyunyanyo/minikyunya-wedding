@@ -22,27 +22,30 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* Love Story에 출력되는 이미지들 바로 밑, Gallery 섹션 바로 위에 들어가는 고정 이미지 */
-    .story-bottom-fixed-image {
-      width: var(--story-bottom-fixed-width, 100%);
-      max-width: var(--story-bottom-fixed-max-width, 100%);
-      margin: var(--story-bottom-fixed-margin, 28px auto 0);
-      transform: translate(var(--story-bottom-fixed-x, 0px), var(--story-bottom-fixed-y, 0px));
+    /* 인사말(소중한 분들을 초대합니다)과 Love Story 사이에 들어가는 고정 이미지 */
+    .intro-fixed-image {
+      width: var(--intro-fixed-width, 100%);
+      max-width: var(--intro-fixed-max-width, 100%);
+      margin: var(--intro-fixed-margin, 0 auto);
+      padding: var(--intro-fixed-padding, 0 24px);
+      transform: translate(var(--intro-fixed-x, 0px), var(--intro-fixed-y, 0px));
       overflow: hidden;
-      border-radius: var(--story-bottom-fixed-radius, 0px);
+      border-radius: var(--intro-fixed-radius, 0px);
       background: transparent;
+      box-sizing: border-box;
     }
 
-    .story-bottom-fixed-image[hidden] {
+    .intro-fixed-image[hidden] {
       display: none !important;
     }
 
-    .story-bottom-fixed-image__photo {
+    .intro-fixed-image__photo {
       display: block;
       width: 100%;
-      height: var(--story-bottom-fixed-height, auto);
-      object-fit: var(--story-bottom-fixed-fit, cover);
-      object-position: var(--story-bottom-fixed-position, center center);
+      height: var(--intro-fixed-height, auto);
+      object-fit: var(--intro-fixed-fit, contain);
+      object-position: var(--intro-fixed-position, center center);
+      border-radius: inherit;
     }
   </style>
   <script src="config.js"></script>
@@ -122,6 +125,16 @@
       </div>
     </section>
 
+    <!-- Greeting과 Love Story 사이 고정 이미지 -->
+    <section class="section intro-fixed-image-section" id="introFixedImageSection" hidden>
+      <div class="section__inner">
+        <div class="intro-fixed-image animate-item" data-animate="fade-up" id="introFixedImageBlock">
+          <img class="intro-fixed-image__photo" id="introFixedImage" src="" alt="웨딩 사진" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+
     <!-- Story Section -->
     <section class="section story" id="story">
       <div class="section__inner">
@@ -129,11 +142,6 @@
         <div class="section__divider animate-item" data-animate="fade-in"></div>
         <p class="story__text animate-item" data-animate="fade-up" id="storyContent"></p>
         <div class="story__photos" id="storyPhotos"></div>
-
-        <!-- Love Story 하단 고정 이미지 : Story 이미지들 바로 밑 / Gallery 바로 위 -->
-        <div class="story-bottom-fixed-image animate-item" data-animate="fade-up" id="storyBottomFixedImageBlock" hidden>
-          <img class="story-bottom-fixed-image__photo" id="storyBottomFixedImage" src="" alt="웨딩 사진" loading="lazy">
-        </div>
       </div>
     </section>
 
@@ -225,7 +233,7 @@
   <script src="script.js"></script>
 
   <script>
-    // CONFIG.storyFixedImage 설정값으로 Love Story 이미지들 바로 밑, Gallery 섹션 바로 위에 추가 이미지를 표시합니다.
+    // CONFIG.introFixedImage 설정값으로 인사말과 Love Story 사이에 추가 이미지를 표시합니다.
     (function () {
       function setCssVar(element, name, value) {
         if (value !== undefined && value !== null && value !== '') {
@@ -233,50 +241,51 @@
         }
       }
 
-      function initStoryBottomFixedImage() {
+      function initIntroFixedImage() {
         if (typeof CONFIG === 'undefined') return;
 
-        var block = document.getElementById('storyBottomFixedImageBlock');
-        var img = document.getElementById('storyBottomFixedImage');
-        var storyPhotos = document.getElementById('storyPhotos');
+        var section = document.getElementById('introFixedImageSection');
+        var block = document.getElementById('introFixedImageBlock');
+        var img = document.getElementById('introFixedImage');
+        var greeting = document.getElementById('greeting');
 
-        // 이전 수정본의 CONFIG.heroFixedImage를 사용 중이어도 그대로 읽히도록 호환 처리
-        var fixedImage = CONFIG.storyFixedImage || CONFIG.heroFixedImage || {};
+        var fixedImage = CONFIG.introFixedImage || {};
         var imageSrc = fixedImage.src || fixedImage.image || fixedImage.path || '';
 
-        if (!block || !img || fixedImage.enabled !== true || !imageSrc) {
-          if (block) block.hidden = true;
+        if (!section || !block || !img || fixedImage.enabled !== true || !imageSrc) {
+          if (section) section.hidden = true;
           return;
         }
 
-        // 정확한 위치: Love Story에 출력되는 이미지들(storyPhotos) 바로 밑
-        if (storyPhotos && storyPhotos.parentNode && block.previousElementSibling !== storyPhotos) {
-          storyPhotos.insertAdjacentElement('afterend', block);
+        // 정확한 위치: '소중한 분들을 초대합니다' 인사말 섹션 바로 뒤, Love Story 섹션 바로 앞
+        if (greeting && greeting.parentNode && section.previousElementSibling !== greeting) {
+          greeting.insertAdjacentElement('afterend', section);
         }
 
         img.src = imageSrc;
         img.alt = fixedImage.alt || '웨딩 사진';
 
-        setCssVar(block, '--story-bottom-fixed-width', fixedImage.width || '100%');
-        setCssVar(block, '--story-bottom-fixed-max-width', fixedImage.maxWidth || '100%');
-        setCssVar(block, '--story-bottom-fixed-margin', fixedImage.margin || '28px auto 0');
-        setCssVar(block, '--story-bottom-fixed-x', fixedImage.x || '0px');
-        setCssVar(block, '--story-bottom-fixed-y', fixedImage.y || '0px');
-        setCssVar(block, '--story-bottom-fixed-radius', fixedImage.radius || '0px');
-        setCssVar(img, '--story-bottom-fixed-height', fixedImage.height || 'auto');
-        setCssVar(img, '--story-bottom-fixed-fit', fixedImage.objectFit || 'cover');
-        setCssVar(img, '--story-bottom-fixed-position', fixedImage.objectPosition || 'center center');
+        setCssVar(block, '--intro-fixed-width', fixedImage.width || '100%');
+        setCssVar(block, '--intro-fixed-max-width', fixedImage.maxWidth || '100%');
+        setCssVar(block, '--intro-fixed-margin', fixedImage.margin || '0 auto');
+        setCssVar(block, '--intro-fixed-padding', fixedImage.padding || '0 24px');
+        setCssVar(block, '--intro-fixed-x', fixedImage.x || '0px');
+        setCssVar(block, '--intro-fixed-y', fixedImage.y || '0px');
+        setCssVar(block, '--intro-fixed-radius', fixedImage.radius || '0px');
+        setCssVar(img, '--intro-fixed-height', fixedImage.height || 'auto');
+        setCssVar(img, '--intro-fixed-fit', fixedImage.objectFit || 'contain');
+        setCssVar(img, '--intro-fixed-position', fixedImage.objectPosition || 'center center');
 
-        block.hidden = false;
+        section.hidden = false;
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initStoryBottomFixedImage);
+        document.addEventListener('DOMContentLoaded', initIntroFixedImage);
       } else {
-        initStoryBottomFixedImage();
+        initIntroFixedImage();
       }
-      window.addEventListener('load', initStoryBottomFixedImage);
-      window.setTimeout(initStoryBottomFixedImage, 300);
+      window.addEventListener('load', initIntroFixedImage);
+      window.setTimeout(initIntroFixedImage, 300);
     })();
   </script>
 </body>

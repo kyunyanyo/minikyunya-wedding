@@ -2,12 +2,18 @@ const CONFIG = {
   // ── 초대장 열기 ──
   useCurtain: false,
 
-  // ── Hero 이미지 바로 아래 고정 이미지 ──
-  // images/hero/fixed.jpg 자리에 실제 파일명을 넣으면 됩니다.
-  heroFixedImage: {
+  // ── 인사말과 Love Story 사이 고정 이미지 ──
+  introFixedImage: {
     enabled: true,
-    src: "images/hero/fixed.jpg",
-    alt: "규현과 민지 웨딩 사진"
+    src: "images/intro/between-greeting-story.jpg",
+    alt: "규현과 민지 웨딩 사진",
+    width: "100%",
+    maxWidth: "100%",
+    margin: "0 auto",
+    padding: "0 24px",
+    radius: "0px",
+    objectFit: "contain",
+    objectPosition: "center center"
   },
 
   // ── 메인 (히어로) ──
